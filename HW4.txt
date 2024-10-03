@@ -1,0 +1,137 @@
+TASK 1
+
+a) Назва схеми — “LibraryManagement”
+
+create database LibraryManagement
+
+Використання за замовчуванням:
+
+use LibraryManagement
+
+
+b) Таблиця "authors":
+author_id (INT, автоматично зростаючий PRIMARY KEY)
+author_name (VARCHAR)
+
+CREATE TABLE authors (
+    author_id INT AUTO_INCREMENT PRIMARY KEY,
+    author_name VARCHAR(50)
+);
+
+
+c) Таблиця "genres":
+genre_id (INT, автоматично зростаючий PRIMARY KEY)
+genre_name (VARCHAR)
+
+CREATE TABLE genres (
+    genre_id  INT AUTO_INCREMENT PRIMARY KEY,
+    genre_name VARCHAR(50)
+);
+
+
+d) Таблиця "books":
+book_id (INT, автоматично зростаючий PRIMARY KEY)
+title (VARCHAR)
+publication_year (YEAR)
+author_id (INT, FOREIGN KEY зв'язок з "Authors")
+genre_id (INT, FOREIGN KEY зв'язок з "Genres")
+
+
+CREATE TABLE books (
+    book_id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    publication_year YEAR NOT NULL,
+    author_id INT,
+    genre_id INT,
+    FOREIGN KEY (author_id) REFERENCES authors(author_id),
+    FOREIGN KEY (genre_id) REFERENCES genres(genre_id)
+);
+
+
+e) Таблиця "users":
+user_id (INT, автоматично зростаючий PRIMARY KEY)
+username (VARCHAR)
+email (VARCHAR)
+
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50),
+    email VARCHAR(25)
+);
+
+
+f) Таблиця "borrowed_books":
+borrow_id (INT, автоматично зростаючий PRIMARY KEY)
+book_id (INT, FOREIGN KEY зв'язок з "Books")
+user_id (INT, FOREIGN KEY зв'язок з "Users")
+borrow_date (DATE)
+return_date (DATE)
+
+
+CREATE TABLE borrowed_books (
+    borrow_id INT AUTO_INCREMENT PRIMARY KEY,
+    book_id INT,
+    user_id INT,
+    borrow_date DATE NOT NULL,
+    return_date DATE,
+    FOREIGN KEY (book_id) REFERENCES books(book_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+TASK 2:
+Скріншоти
+
+TASK 3:
+select orders.id as order_id,
+    orders.date as order_date,
+    products.name as product_name,
+    categories.name as category_name,
+    categories.description as category_description,
+    suppliers.name as supplier_name,
+    suppliers.contact as supplier_contact,
+    suppliers.address as supplier_address,
+    suppliers.city as supplier_city,
+    suppliers.postal_code as supplier_post_code,
+    suppliers.country as supplier_country,
+    suppliers.phone  as supplier_phone,
+    products.unit as product_unit,
+    products.price as product_price,
+    order_details.quantity as product_qnt,
+    customers.name as customer_name,
+    customers.contact as customer_contact,
+    customers.address as customer_address,
+    customers.city as customer_city,
+    customers.postal_code as customer_post_code,
+    customers.country as customer_country,
+    employees.last_name as employee_last_name,
+    employees.first_name as employee_first_name,
+    employees.birthdate as employee_birthdate,
+    employees.photo as employee_photo,
+    employees.notes as employee_notes,
+    shippers.name as shipper_name,
+    shippers.phone as shipper_phone
+from orders
+inner join shippers on orders.shipper_id = shippers.id
+inner join customers on orders.customer_id = customers.id
+inner join employees on orders.employee_id = employees.employee_id
+inner join order_details on order_details.order_id = orders.id
+inner join products on order_details.product_id = products.id
+inner join suppliers on products.supplier_id = suppliers.id
+inner join categories on products.category_id = categories.id
+order by orders.id
+
+TASK 4:
+
+Для запита, який наведено в завданні 3, зміна inner join на left join чи right join не змінює кількість рядків в результуючий таблиці. На це впливає то, що кількість унікальних ідентифікаторів в таблицях order_details та orders є однаковою (196).
+Для підтвердження можна зробити такий запит до БД (Screenshot p4-8):
+
+SELECT COUNT(distinct(order_details.order_id)), count(distinct(orders.id))
+FROM orders
+left JOIN order_details ON order_details.order_id = orders.id
+right JOIN products ON order_details.product_id = products.id
+INNER JOIN suppliers ON products.supplier_id = suppliers.id
+INNER JOIN categories ON products.category_id = categories.id
+INNER JOIN customers ON orders.customer_id = customers.id
+INNER JOIN employees ON orders.employee_id = employees.employee_id
+INNER JOIN shippers ON orders.shipper_id = shippers.id
+
